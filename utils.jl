@@ -1,16 +1,17 @@
-using Gtk
-using Violet
+using Gtk, Violet
 
 # example of using GtkBuilder
-b = @GtkBuilder(filename=joinpath(dirname(@__FILE__), "ex1.glade"))
-w = GAccessor.object(b, "window1")
+#b = @GtkBuilder(filename=joinpath(dirname(@__FILE__), "ex1.glade"))
+#w = GAccessor.object(b, "window1")
 
 "If not in REPL, hang until given window isn't destroyed.
 Place this function in the end of your script which uses Gtk."
 function eventloop(win)
   if !isinteractive()
+    @async Gtk.gtk_main()
     c = Condition()
     signal_connect(win, :destroy) do widget
+      Gtk.gtk_quit()
       notify(c)
     end
     wait(c)
