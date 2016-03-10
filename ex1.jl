@@ -6,10 +6,8 @@ myform = @GtkBuilder(filename=joinpath(dirname(@__FILE__), "ex1.glade"))
 win = GAccessor.object(myform, "window1")
 showall(win)
 
-engineswitch, audioswitch, videoswitch, sineswitch,
-sineadjustment =
-  map(["engineswitch", "audioswitch", "videoswitch", "sineswitch",
-       "sineadjustment",]) do id
+engineswitch, sineswitch, sineadjustment =
+  map(["engineswitch", "sineswitch", "sineadjustment",]) do id
     GAccessor.object(myform, id)
   end
 
@@ -24,38 +22,13 @@ end
 
 engine = Engine()
 
-audiopid = nothing
-videopid = nothing
-
 ν = Signal(Float64, 440.0)
-sineugen = sine(ν)
+θ = sine(220.0)
+#sineugen = sine(ν, θ)
+sineugen = sine(sine(1.0), sine(ν))
 
 signal_connect(engineswitch, "state-set") do widget, state
   put!(enginestate, state)
-  nothing # important to not corrupt Gtk state
-end
-
-signal_connect(audioswitch, "state-set") do widget, state
-  if state
-    global audiopid = addaudio()
-  else
-    if audiopid != nothing
-      kill(audiopid)
-      global audiopid = nothing
-    end
-  end
-  nothing # important to not corrupt Gtk state
-end
-
-signal_connect(videoswitch, "state-set") do widget, state
-  if state
-    global videopid = addvideo()
-  else
-    if videopid != nothing
-      kill(videopid)
-      global videopid = nothing
-    end
-  end
   nothing # important to not corrupt Gtk state
 end
 
